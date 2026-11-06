@@ -314,3 +314,82 @@ cover_letter:
 #     cross_role_bucket: "all_EM_roles"
 #     applied_to: ["Senior Software Engineer"]
 #     last_apply_date: "2026-01-01"
+
+# ── autojobs: Autopilot ─────────────────────────────────────────────────────
+#
+# Daily "check my sources and apply" routine (modes/autopilot.md). `node init.mjs`
+# fills the basics; everything here can be edited by hand.
+autopilot:
+  # Which browser the agent drives:
+  #   ego    — Ego Lite (`ego-browser` CLI, https://lite.ego.app). Works in scheduled/headless runs.
+  #   chrome — your own Chrome via the Claude in Chrome extension. Interactive sessions only
+  #            (start Claude Code with `claude --chrome`). See docs/AUTOPILOT.md.
+  browser: ego
+  # false (default): the agent fills the form and STOPS on the review page; you submit.
+  # true: the agent submits a form it filled with zero open questions. You still
+  #       review every answer in data/answer-bank.md afterwards. Use with care.
+  auto_submit: false
+  # Roles scoring below this are reported, not applied to, unless you say otherwise.
+  min_score: 4.0
+  portal_login:
+    # Account email for ATS portals (Workday, Taleo, ...). Defaults to candidate.email.
+    email: ""
+    # macOS Keychain item holding the portal password. Create it once with:
+    #   security add-generic-password -a you@example.com -s autojobs-portals -w
+    # (it prompts; the password never touches a file or the agent's context).
+    keychain_service: "autojobs-portals"
+  sources:
+    simplify:
+      enabled: true
+      repo: "SimplifyJobs/Summer2027-Internships"   # or SimplifyJobs/New-Grad-Positions
+      since_days: 7
+      terms: ["Summer 2027"]                        # [] = any term
+      locations: ["united states", "canada", "remote"]
+      company_exclude: []                           # companies you never want
+      # title_include / title_exclude / categories: see DEFAULTS in scan-simplify.mjs
+    stories:
+      enabled: false
+      # Instagram creators who post job lists in their stories. Needs Instagram
+      # signed in inside the browser you picked above. Ego only for scheduled runs.
+      instagram: []
+
+# ── autojobs: Application answers ───────────────────────────────────────────
+#
+# What the form fillers enter. Leave a value blank (or delete it) and the agent
+# ASKS YOU instead of guessing. Export-control / ITAR questions are always asked.
+application:
+  legal_name: { first: "", last: "" }   # defaults to candidate.full_name split
+  preferred_name: ""
+  phone_type: "Mobile"
+  address: { line1: "", city: "", region: "", postal_code: "", country: "" }
+  work_auth:
+    # These win over location.authorized_in / needs_sponsorship. null = the agent asks you.
+    us_authorized: null                   # legally authorized to work in the US?
+    needs_sponsorship: null               # need visa sponsorship now or in the future?
+    us_citizen_or_permanent_resident: null
+  over_18: null
+  relocate: null
+  onsite_ok: null
+  previous_employers: []                  # companies you worked at before (their forms get asked by hand)
+  relatives_at_employers: null
+  non_compete: null
+  background_check_ok: null
+  sms_opt_in: null
+  accept_terms: null                      # true = agree to standard application terms / privacy notices
+  how_heard: ["Job Board", "Internet", "Website", "Other"]   # preference order for "How did you hear about us"
+  years_experience_option: ""             # e.g. "0-2" to match that option
+  education:
+    school: ""
+    degree: ""                            # as the forms spell it, e.g. "Bachelor's Degree"
+    field: ""
+    gpa: ""                               # blank = left empty unless a form requires it
+    start: ""                             # YYYY-MM
+    end: ""                               # YYYY-MM
+    graduation: ""                        # e.g. "April 2028"
+    class_standing: ""                    # e.g. "Junior"
+    enrolled: null
+  # Work history typed into Workday/Oracle "My Experience". Copy from cv.md; nothing else is invented.
+  experience: []
+  #  - { title: "Software Engineer Intern", company: "Acme", location: "Toronto ON", start: "2025-05", end: "2025-08", description: "..." }
+  # Self-identification. Blank = pick the "decline to answer" option.
+  eeo: { gender: "", race: "", hispanic: "", veteran: "", disability: "" }

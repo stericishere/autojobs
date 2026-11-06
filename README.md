@@ -1,3 +1,32 @@
+# autojobs
+
+**Your job search on autopilot, with you in the loop.** autojobs is a fork of
+[career-ops](https://github.com/santifer/career-ops) (MIT) that adds:
+
+- **`npm run setup`**: a guided first run that creates your private config and checks your browser.
+- **New sources**: SimplifyJobs listings (`npm run scan:simplify`) and Instagram creators who post
+  job lists in their stories.
+- **Form filling** through a real browser, either **[Ego Lite](https://lite.ego.app)** or **your own
+  Chrome via Claude in Chrome**: Greenhouse and Workday drivers, playbooks for iCIMS,
+  SmartRecruiters, Oracle HCM and more, all answering from one profile.
+- **The `autopilot` mode**: say "run autopilot" and the agent collects new roles, scores them,
+  tailors a CV, and fills each application, stopping on the review page for you
+  (`auto_submit` is off by default).
+
+## Quick start
+
+```bash
+git clone https://github.com/stericishere/autojobs && cd autojobs
+npm install && npx playwright install chromium
+npm run setup          # answers go to git-ignored files on your machine
+claude                 # or: claude --chrome   (then say "run autopilot")
+```
+
+Read **[docs/AUTOPILOT.md](docs/AUTOPILOT.md)** for the browser choice, sources, safety rails and
+scheduling. Everything below is the upstream career-ops documentation, which applies unchanged.
+
+---
+
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/wordmark-dark.svg"><img src="docs/wordmark-light.svg" alt="career-ops" width="250" height="56"></picture></p>
 
 <div align="center">

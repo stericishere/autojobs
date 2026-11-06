@@ -37,8 +37,11 @@ import { fileURLToPath, pathToFileURL } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-const CANONICAL_REPO = 'https://github.com/santifer/career-ops.git';
-const RAW_VERSION_URL = 'https://raw.githubusercontent.com/santifer/career-ops/main/VERSION';
+// autojobs ships its own system layer (autopilot wiring in AGENTS.md, the router and the
+// profile template), so updates come from the autojobs repo, which merges upstream
+// career-ops releases. Pulling straight from career-ops would drop that wiring.
+const CANONICAL_REPO = 'https://github.com/stericishere/autojobs.git';
+const RAW_VERSION_URL = 'https://raw.githubusercontent.com/stericishere/autojobs/main/VERSION';
 const RELEASES_API = 'https://api.github.com/repos/santifer/career-ops/releases/latest';
 
 // Matches a semver, with or without a leading `v` and an optional
@@ -156,6 +159,12 @@ const SYSTEM_PATHS = [
   'lib/local-today.mjs',
   'lib/latex-escape.mjs',
   'scan-hn.mjs',
+  // autojobs autopilot layer
+  'autopilot/',
+  'modes/ats/',
+  'modes/autopilot.md',
+  'init.mjs',
+  'scan-simplify.mjs',
   'scripts/check-syntax.mjs',
   'story-provenance-check.mjs',
   'lib/latex-content.mjs',

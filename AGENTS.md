@@ -1,5 +1,9 @@
 # Career-Ops -- AI Job Search Pipeline
 
+## autojobs
+
+This repository is **autojobs**, a fork of [career-ops](https://github.com/santifer/career-ops) that adds an autopilot layer: `node init.mjs` first-run setup, `scan-simplify.mjs`, Instagram story sources, ATS form fillers (`autopilot/`) and the `autopilot` mode. A new user starts with `node init.mjs`; if `config/profile.yml` is missing on the first message, suggest it before the onboarding below. Everything else in this file applies unchanged.
+
 ## Origin
 
 Built and used by [santifer](https://santifer.io) to evaluate 740+ offers, generate 100+ tailored CVs, and land a Head of Applied AI role. The archetypes, scoring, and negotiation scripts reflect that search; his portfolio is also open source: [cv-santiago](https://github.com/santifer/cv-santiago).
@@ -324,6 +328,7 @@ Two separate axes:
 | Asks about follow-ups or application cadence | `followup` |
 | Wants to classify application replies and review updates | `reply-watch` — classifies replies, matches to applications, suggests tracker updates |
 | Wants to record application outcome & archive artifacts | `outcome` |
+| Says "run autopilot" / "check my sources and apply" | `autopilot` — scans SimplifyJobs and configured Instagram story creators, evaluates new roles, fills applications through the configured browser (`autopilot.browser`: Ego Lite or Claude in Chrome) with answers from `config/profile.yml` → `application:`; stops on the review page unless `autopilot.auto_submit: true`. ATS playbooks in `modes/ats/` |
 | Wants to update the system | `update` |
 | Wants to queue a request for later / check the inbox between sessions | `agent-inbox` — append-only checklist drained next session; nothing auto-submits |
 | Wants to add a finished project, paper, or role to the CV | `add` — source-grounded preview, confirm-before-write; dedup + insertion via `add-entry.mjs` |

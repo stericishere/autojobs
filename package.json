@@ -1,12 +1,14 @@
 {
-  "name": "career-ops",
+  "name": "autojobs",
   "version": "1.28.0",
-  "description": "AI-powered job search pipeline — works with any AI coding CLI (Claude Code, Codex, OpenCode, Antigravity, Grok, Qwen, Kimi, Copilot)",
+  "description": "Job search autopilot on top of career-ops: scan sources, evaluate, tailor CVs and fill applications with your AI coding agent (Ego Lite or Claude in Chrome)",
   "private": true,
   "engines": {
     "node": ">=18"
   },
   "scripts": {
+    "setup": "node init.mjs",
+    "scan:simplify": "node scan-simplify.mjs --summary",
     "doctor": "node doctor.mjs",
     "or": "node openrouter-runner.mjs",
     "or:scan": "node openrouter-runner.mjs scan",

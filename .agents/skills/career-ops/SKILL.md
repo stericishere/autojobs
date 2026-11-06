@@ -75,6 +75,7 @@ Determine the mode from `$mode`:
 | `upskill` | `upskill` |
 | `followup` | `followup` |
 | `reply-watch` | `reply-watch` |
+| `autopilot` | `autopilot` |
 | `outcome` | `outcome` |
 | `interview-redflag` | `interview-redflag` |
 | `update` | `update` |
@@ -154,6 +155,7 @@ Available commands:
   /career-ops offer-prep → Read a received offer/contract with the candidate: clause walk + lawyer questions (not legal advice)
   /career-ops titles    → Suggest adjacent job titles from your CV to broaden the search
   /career-ops upskill   → Aggregate skill-gap analysis from your evaluated reports
+  /career-ops autopilot → Check sources (Simplify, stories), evaluate, fill applications (review gate on)
   /career-ops followup  → Follow-up cadence tracker: flag overdue, generate drafts
   /career-ops outcome   → Record application outcome & archive artifacts
   /career-ops update    → Update career-ops system files with diff preview + compat check
@@ -174,7 +176,7 @@ If `modes/_custom.md` exists, read it after `modes/_profile.md` and before the s
 
 Read `modes/_shared.md` + `modes/_profile.md` (if exists) + `modes/_custom.md` (if exists) + `modes/{mode}.md`
 
-Applies to: `auto-pipeline`, `oferta`, `ofertas`, `pdf`, `contacto`, `apply`, `pipeline`, `scan`, `batch`
+Applies to: `auto-pipeline`, `oferta`, `ofertas`, `pdf`, `contacto`, `apply`, `pipeline`, `scan`, `batch`, `autopilot`
 
 ### Standalone modes with profile and custom context
 

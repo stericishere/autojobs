@@ -285,10 +285,10 @@ See [LEGAL_DISCLAIMER.md](LEGAL_DISCLAIMER.md). Provided under the [MIT License]
 
 ## Credits and license
 
-autojobs is a fork of [career-ops](https://github.com/career-ops-hq/career-ops), created by
-[Santiago Fernández de Valderrama](https://santifer.io) (santifer) and
-[its contributors](https://github.com/career-ops-hq/career-ops/graphs/contributors). If it helps you,
-star them too and read the [CareerOps Manifesto](https://career-ops.org/manifesto).
+autojobs is built on [career-ops](https://github.com/career-ops-hq/career-ops), licensed under
+MIT. Its copyright notice is kept in [LICENSE](LICENSE). Maintained by
+[@stericishere](https://github.com/stericishere); contributors are listed in
+[CONTRIBUTORS.md](CONTRIBUTORS.md).
 
-Code: [MIT](LICENSE). The "career-ops" name belongs to its owners under their
-[Trademark Policy](TRADEMARK.md); autojobs is an independent project and not endorsed by them.
+The "career-ops" name belongs to its owners ([Trademark Policy](TRADEMARK.md)). autojobs is an
+independent project and is not endorsed by them.

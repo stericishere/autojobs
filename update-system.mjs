@@ -42,7 +42,7 @@ const ROOT = __dirname;
 // career-ops releases. Pulling straight from career-ops would drop that wiring.
 const CANONICAL_REPO = 'https://github.com/stericishere/autojobs.git';
 const RAW_VERSION_URL = 'https://raw.githubusercontent.com/stericishere/autojobs/main/VERSION';
-const RELEASES_API = 'https://api.github.com/repos/santifer/career-ops/releases/latest';
+const RELEASES_API = 'https://api.github.com/repos/stericishere/autojobs/releases/latest';
 
 // Matches a semver, with or without a leading `v` and an optional
 // Release Please component prefix (e.g. `career-ops-v1.9.0` → `1.9.0`).
@@ -1329,7 +1329,7 @@ async function check() {
   // deliberately conservative: version checks still work offline/behind a
   // restricted git transport.
   try { localCommit = gitQuiet('rev-parse', 'HEAD'); } catch { /* no git checkout */ }
-  const remoteRef = await curlGet('https://api.github.com/repos/santifer/career-ops/git/ref/heads/main', [
+  const remoteRef = await curlGet('https://api.github.com/repos/stericishere/autojobs/git/ref/heads/main', [
     '--header', 'Accept: application/vnd.github+json',
     '--header', 'User-Agent: career-ops-update-checker',
   ]);

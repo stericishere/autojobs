@@ -1,6 +1,6 @@
 {
   "name": "autojobs",
-  "version": "1.28.0",
+  "version": "1.29.0",
   "description": "Job search autopilot on top of career-ops: scan sources, evaluate, tailor CVs and fill applications with your AI coding agent (Ego Lite or Claude in Chrome)",
   "private": true,
   "engines": {

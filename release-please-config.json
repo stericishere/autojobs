@@ -4,7 +4,7 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "career-ops",
+      "package-name": "autojobs",
       "extra-files": [
         {
           "type": "json",
@@ -48,5 +48,6 @@
       "component": "web",
       "include-component-in-tag": true
     }
-  }
+  },
+  "last-release-sha": "10a569b1e9178aa90ef8028ea287e411a831e1b6"
 }

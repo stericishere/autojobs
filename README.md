@@ -1,31 +1,126 @@
-# autojobs
+<p align="center">
+  <img src="docs/autojobs-hero.jpg" alt="autojobs: your job search on autopilot, with you in the loop" width="820">
+</p>
 
-**Your job search on autopilot, with you in the loop.** autojobs is a fork of
-[career-ops](https://github.com/santifer/career-ops) (MIT) that adds:
+<h1 align="center">autojobs</h1>
 
-- **`npm run setup`**: a guided first run that asks for your details, education, work history and CV, creates your private config and checks your browser.
-- **New sources**: SimplifyJobs listings (`npm run scan:simplify`) and Instagram creators who post
-  job lists in their stories.
-- **Form filling** through a real browser, either **[Ego Lite](https://lite.ego.app)** or **your own
-  Chrome via Claude in Chrome**: Greenhouse and Workday drivers, playbooks for iCIMS,
-  SmartRecruiters, Oracle HCM and more, all answering from one profile.
-- **The `autopilot` mode**: say "run autopilot" and the agent collects new roles, scores them,
-  tailors a CV, and fills each application, stopping on the review page for you
-  (`auto_submit` is off by default).
+<p align="center">
+  <strong>Your job search on autopilot, with you in the loop.</strong><br>
+  Finds new roles, scores them against your CV, tailors a resume and fills the application
+  in a real browser, then stops on the review page so you make the final click.
+</p>
+
+<p align="center">
+  <a href="https://github.com/stericishere/autojobs/releases/latest"><img src="https://img.shields.io/github/v/release/stericishere/autojobs?label=release" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
+  <a href="https://github.com/career-ops-hq/career-ops"><img src="https://img.shields.io/badge/built%20on-career--ops-6f42c1" alt="Built on career-ops"></a>
+</p>
+
+---
+
+## How it works
+
+```mermaid
+flowchart LR
+  S[SimplifyJobs listings] --> P[(pipeline)]
+  I[Instagram job stories] --> P
+  C[career-ops portal scan] --> P
+  P --> E[Evaluate<br/>score 1-5]
+  E -->|score ≥ min_score| T[Tailored CV<br/>PDF]
+  T --> F[Fill the form<br/>Ego Lite or Chrome]
+  F --> R{Review page}
+  R -->|you submit| K[Tracker +<br/>answer bank]
+```
+
+Say **"run autopilot"** and the agent runs that loop. Anything it can't answer from your profile
+(a salary number, an export-control question, a CAPTCHA, an email code) comes back to you instead
+of being guessed.
+
+## What autojobs adds to career-ops
+
+| | |
+|---|---|
+| **Guided setup** | `npm run setup` asks for your details, work authorization, education, work history and CV, and checks your browser. |
+| **More sources** | SimplifyJobs listings (`npm run scan:simplify`, zero LLM cost) and Instagram creators who post job lists in their stories. |
+| **Form filling** | Scripted Greenhouse and Workday drivers (Workday sign-in, account creation, experience, education, self-ID), plus playbooks for iCIMS, SmartRecruiters, Oracle HCM, Taleo and more. |
+| **One answer source** | Every form answer comes from rules over `config/profile.yml`. Same question, same answer; unknowns are asked, never guessed. Every question and answer is logged to `data/answer-bank.md`. |
+| **Your browser, your logins** | Runs in [Ego Lite](https://lite.ego.app) (default) or your own Chrome through Claude in Chrome. Portal passwords are read from the macOS Keychain, never written to a file. |
+| **Review gate** | Stops on every review page. `auto_submit` is off by default and only ever fires when every field was answered from your profile. |
 
 ## Quick start
 
 ```bash
 git clone https://github.com/stericishere/autojobs && cd autojobs
 npm install && npx playwright install chromium
-npm run setup          # answers go to git-ignored files on your machine
-claude                 # or: claude --chrome   (then say "run autopilot")
+npm run setup        # ~5 minutes; everything it writes is git-ignored
+claude               # or: claude --chrome
 ```
 
-Read **[docs/AUTOPILOT.md](docs/AUTOPILOT.md)** for the browser choice, sources, safety rails and
-scheduling. Everything below is the upstream career-ops documentation, which applies unchanged.
+Then say **"run autopilot"**. Full guide: **[docs/AUTOPILOT.md](docs/AUTOPILOT.md)**.
+
+<details>
+<summary>What <code>npm run setup</code> asks</summary>
+
+1. Name, email, phone, city, country, target roles, the term to scan (e.g. "Summer 2027" or "new grad").
+2. Are you authorized to work in the US? Do you need sponsorship? Blank means "ask me on each form".
+3. Browser (`ego` or `chrome`), auto-submit (default no), Instagram creators to follow.
+4. Education and work history, one job at a time.
+5. Your CV: a `.md` becomes `cv.md`; a PDF or DOCX is converted with you on first run ("run intake").
+
+It never overwrites an existing file, so rerunning it is safe.
+</details>
+
+## Pick a browser
+
+| | **Ego Lite** (default) | **Chrome** |
+|---|---|---|
+| What it is | An agent-friendly Chromium with its own profile | Your everyday Chrome via the Claude in Chrome extension |
+| Form filling | Scripted drivers, end to end | The agent reads and fills each page, following `modes/ats/*.md` |
+| Scheduled runs | Yes (collect and evaluate) | No, interactive only |
+| What the agent can reach | Only sites you signed into **inside Ego** | Everything you're signed into in Chrome |
+| Setup | Install from [lite.ego.app](https://lite.ego.app) | Install the "Claude" extension (paid Claude plan), start with `claude --chrome` |
+
+## Safety
+
+Job postings and application forms are written by strangers. A page can hide text aimed at the AI
+("ignore your instructions and …"), which is called prompt injection. autojobs treats page text as
+data, never as instructions, but no model obeys that perfectly. What a tricked agent could touch is
+whatever the browser is signed into, so:
+
+- **Keep the Ego Lite profile for job hunting only**: job portals and Instagram. Don't sign into
+  your email, bank or GitHub there.
+- **Get email codes through a mail connector**, not an inbox tab in the same browser.
+- **Leave `auto_submit` off** unless you are watching the run.
+- **Hard limits that are always yours**: export-control / ITAR / citizenship-in-listed-countries
+  questions, salary numbers, CAPTCHAs, browser permission prompts.
+
+Quality beats volume: autojobs skips roles under `min_score` (default 4.0/5). Recruiters remember
+spam.
+
+## autojobs vs career-ops
+
+| | career-ops | autojobs |
+|---|---|---|
+| Find roles | Portal scans, pasted URLs | + SimplifyJobs, Instagram stories |
+| Browser | Fresh Playwright window, signed into nothing | Ego Lite or Chrome, with your logins |
+| Fill forms | Agent drafts and fills | Scripted Greenhouse and Workday; agent-driven elsewhere |
+| Submit | Never | You, by default; opt-in auto-submit |
+| Workday accounts | Signed in by hand every time | Signed in from the Keychain |
+
+career-ops is the safer choice if you want zero automation of logged-in sessions; autojobs is for
+when you want the busywork done and are willing to own that tradeoff.
+
+## Credits
+
+autojobs is a fork of [career-ops](https://github.com/career-ops-hq/career-ops) by
+[santifer](https://santifer.io) and contributors, MIT licensed. Evaluation, CV generation,
+tracking, interview prep and everything below this line come from career-ops, updated through its
+releases.
 
 ---
+
+> **The rest of this README is the upstream career-ops documentation.** It applies unchanged to autojobs.
+
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/wordmark-dark.svg"><img src="docs/wordmark-light.svg" alt="career-ops" width="250" height="56"></picture></p>
 

@@ -10,11 +10,15 @@
  *   node init.mjs --yes           accept defaults (CI / scripted)
  *   node init.mjs --target DIR    set up a different checkout (used by tests)
  *
- * Your CV is not created here: start your agent (`claude`) afterwards and it will
- * walk you through cv.md (paste it, a LinkedIn URL, or a conversation).
+ * It also asks for your education, work history and an existing CV file:
+ *   - a .md CV is copied to cv.md;
+ *   - a PDF/DOCX/TXT CV is copied into documents/cv/, and the agent's `intake`
+ *     mode turns it into cv.md with you on first run;
+ *   - no file: the agent builds cv.md with you (paste it, LinkedIn URL, or a chat).
  */
-import { existsSync, mkdirSync, copyFileSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { existsSync, mkdirSync, copyFileSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { join, dirname, resolve, basename, extname } from 'node:path';
+import { homedir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
@@ -51,7 +55,8 @@ const yaml = (s) => JSON.stringify(s); // a JSON string is a valid YAML scalar
 
 function setLine(text, pattern, replacement) {
   if (!pattern.test(text)) throw new Error(`profile template changed: ${pattern} not found`);
-  return text.replace(pattern, replacement);
+  // A function replacement keeps "$" in user answers literal.
+  return text.replace(pattern, typeof replacement === 'function' ? replacement : () => replacement);
 }
 
 async function main() {
@@ -108,9 +113,44 @@ async function main() {
       t = setLine(t, /      instagram: \[\]/, `      instagram: ${JSON.stringify(handles)}`);
     }
     t = setLine(t, /address: \{ line1: "", city: "", region: "", postal_code: "", country: "" \}/, `address: { line1: "", city: ${yaml(city)}, region: "", postal_code: "", country: ${yaml(country)} }`);
+
+    console.log('\nEducation (typed into Workday/Oracle forms). Leave the school blank to skip.\n');
+    const school = await ask('School', '');
+    if (school) {
+      const edu = {
+        school,
+        degree: await ask('Degree, as forms spell it (e.g. "Bachelor\'s Degree")', ''),
+        field: await ask('Field of study', ''),
+        start: await ask('Start (YYYY-MM)', ''),
+        end: await ask('End or expected end (YYYY-MM)', ''),
+        graduation: await ask('Graduation, in words (e.g. "April 2028")', ''),
+        gpa: await ask('GPA (blank = leave empty unless a form requires it)', ''),
+      };
+      for (const [k, v] of Object.entries(edu)) {
+        t = setLine(t, new RegExp(`(\\n  education:\\n(?:    .*\\n)*?    ${k}: )""`), (_, pre) => pre + yaml(v));
+      }
+    }
+
+    console.log('\nWork history (typed into "My Experience" sections). Copy it from your CV; nothing else is invented.\n');
+    const jobs = [];
+    while (/^y/i.test(await ask(`Add ${jobs.length ? 'another' : 'a'} job? (y/N)`, 'n'))) {
+      const job = {
+        title: await ask('  Title', ''),
+        company: await ask('  Company', ''),
+        location: await ask('  Location', ''),
+        start: await ask('  Start (YYYY-MM)', ''),
+        end: await ask('  End (YYYY-MM, blank = current)', ''),
+        description: await ask('  One-line description', ''),
+      };
+      if (job.title && job.company) jobs.push(job);
+      else console.log('  skipped: title and company are required');
+    }
+    if (jobs.length) t = setLine(t, /\n  experience: \[\]/, `\n  experience:\n${jobs.map((j) => `    - ${JSON.stringify(j)}`).join('\n')}`);
     writeFileSync(at('config/profile.yml'), t);
     console.log('\n  wrote config/profile.yml');
   }
+
+  await importCv();
 
   const browser = /\n  browser: chrome/.test(readFileSync(at('config/profile.yml'), 'utf8')) ? 'chrome' : 'ego';
   console.log(`\nBrowser backend: ${browser}`);
@@ -137,12 +177,36 @@ async function main() {
   console.log('\nNext steps:');
   console.log('  1. Fill the application: block in config/profile.yml (work authorization, education, EEO).');
   console.log('     Anything left blank, the agent will ask you instead of guessing.');
-  console.log(`  2. Start your agent in this folder (\`claude${browser === 'chrome' ? ' --chrome' : ''}\`). It will set up cv.md with you.`);
+  const cvNext = existsSync(at('cv.md')) ? 'Your cv.md is in place.'
+    : existsSync(at('documents/cv')) && readdirSync(at('documents/cv')).length ? 'Say "run intake" and it turns documents/cv/ into cv.md with you.'
+    : 'It will set up cv.md with you.';
+  console.log(`  2. Start your agent in this folder (\`claude${browser === 'chrome' ? ' --chrome' : ''}\`). ${cvNext}`);
   console.log('  3. Say "run autopilot" to scan your sources, evaluate the roles and fill applications.\n');
   rl?.close();
 
   const doctor = spawnSync(process.execPath, [at('doctor.mjs')], { cwd: ROOT, stdio: YES ? 'pipe' : 'inherit', encoding: 'utf8' });
   if (YES) process.stdout.write(doctor.stdout || '');
+}
+
+// Copy an existing CV in: .md becomes cv.md; anything else goes to documents/cv/ for `intake`.
+async function importCv() {
+  if (existsSync(at('cv.md'))) return;
+  console.log('\nYour CV. A .md file becomes cv.md; a PDF, DOCX or TXT is kept for the agent to convert.');
+  const raw = await ask('Path to your CV (blank = build it with the agent later)', '');
+  if (!raw) return;
+  const src = resolve(raw.replace(/^~(?=\/)/, homedir()).replace(/^(['"])(.*)\1$/, '$2'));
+  if (!existsSync(src) || !statSync(src).isFile()) {
+    console.log(`  ✗ ${src} not found; skipped. Give it to the agent later instead.`);
+    return;
+  }
+  if (extname(src).toLowerCase() === '.md') {
+    copyFileSync(src, at('cv.md'));
+    console.log('  created cv.md');
+  } else {
+    mkdirSync(at('documents/cv'), { recursive: true });
+    copyFileSync(src, at('documents/cv', basename(src)));
+    console.log(`  copied to documents/cv/${basename(src)}`);
+  }
 }
 
 main().catch((e) => {

@@ -16,20 +16,31 @@ sources ──► data/pipeline.md ──► evaluate ──► tailored PDF ─
 git clone https://github.com/stericishere/autojobs && cd autojobs
 npm install
 npx playwright install chromium    # used for PDF rendering
-npm run setup                      # = node init.mjs, asks ~12 questions
+npm run setup                      # = node init.mjs
 ```
 
 `init` creates your private files (`config/profile.yml`, `portals.yml`, `modes/_profile.md`,
-`modes/_custom.md`, `data/*`) from the templates. It never overwrites a file that exists, and all
-of them are git-ignored, so your data stays on your machine.
+`modes/_custom.md`, `data/*`) from the templates, then asks for:
+
+- contact details, target roles and the term to scan;
+- US work authorization and sponsorship (blank = the agent asks you on each form);
+- browser backend, auto-submit (default off), Instagram story sources;
+- education (school, degree, field, dates, optional GPA) and work history, one job at a time;
+- your existing CV: a `.md` file becomes `cv.md`; a PDF, DOCX or TXT is copied to
+  `documents/cv/` for the agent to convert.
+
+It never overwrites a file that exists (rerunning it is safe; if `config/profile.yml` already
+exists it skips the profile questions), and every file it writes is git-ignored, so your data
+stays on your machine. **Leave anything you are unsure about blank**: blank means the agent asks
+you instead of guessing.
 
 Then:
 
-1. Open `config/profile.yml` and fill the `application:` block: work authorization, education,
-   work history (copy it from your CV), EEO answers. **Leave anything you are unsure about blank.**
-   Blank means the agent asks you on the form instead of guessing.
-2. Start your agent in the folder (`claude`, or `claude --chrome` for the Chrome backend). On the
-   first message it notices `cv.md` is missing and builds it with you.
+1. Optional: fill the rest of the `application:` block in `config/profile.yml` (address, EEO
+   answers, relocation, how you heard about roles).
+2. Start your agent in the folder (`claude`, or `claude --chrome` for the Chrome backend).
+   If you gave a PDF/DOCX CV, say **"run intake"** and it builds `cv.md` from it with you; with no
+   CV at all, it builds one with you from a paste, a LinkedIn URL or a conversation.
 3. Say **"run autopilot"**.
 
 ## 2. Pick a browser

@@ -3,7 +3,7 @@
 **Your job search on autopilot, with you in the loop.** autojobs is a fork of
 [career-ops](https://github.com/santifer/career-ops) (MIT) that adds:
 
-- **`npm run setup`**: a guided first run that creates your private config and checks your browser.
+- **`npm run setup`**: a guided first run that asks for your details, education, work history and CV, creates your private config and checks your browser.
 - **New sources**: SimplifyJobs listings (`npm run scan:simplify`) and Instagram creators who post
   job lists in their stories.
 - **Form filling** through a real browser, either **[Ego Lite](https://lite.ego.app)** or **your own
